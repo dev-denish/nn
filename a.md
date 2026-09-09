@@ -9,7 +9,6 @@
 
 ## 0. Verification status of this document — read this first
 
-The user asked for cross-checking. Here is exactly what was and was not verified, so nothing in this document is trusted more than it deserves.
 
 ### Facts verified against primary sources (September 2026)
 
