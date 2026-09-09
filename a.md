@@ -755,13 +755,6 @@ Sentinel-2 NDVI and Landsat NDVI over the same field on the same day will differ
 
 ### One-time build
 
-| Item | Range |
-|---|---|
-| Engineering (4–6 people, India, ~18 months) | ₹1.5–2.5 Cr ($180–300k) |
-| Field validation / ground truth campaigns | ₹20–50 L ($25–60k) |
-| GEE commercial licence during Phase 1 prototyping | ~$500–2,000/month |
-| Cloud infra during build | Low tens of thousands USD |
-| **Total** | **~$250–450k (₹2–3.8 Cr)** |
 
 ### Recurring, at steady state
 
