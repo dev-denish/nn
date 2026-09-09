@@ -11,8 +11,6 @@
 
 The user asked for cross-checking. Here is exactly what was and was not verified, so nothing in this document is trusted more than it deserves.
 
-**I cannot spawn multiple independent agents to cross-check.** That capability is not available in this session. What I did instead: verified every load-bearing factual claim against primary vendor documentation (USGS, ESA/Copernicus, AWS), and flagged inline where a claim is engineering judgement rather than documented fact.
-
 ### Facts verified against primary sources (September 2026)
 
 | Claim | Verified value | Source |
