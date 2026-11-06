@@ -1,0 +1,271 @@
+# Field Data to Dashboard: End-to-End Guide
+
+Nov 5, 2026 · @Denish
+
+This guide explains how field teams record locations and photos on a phone and see them appear on the VNV dashboard automatically. It uses only open-source software, running on our own cloud server.
+
+## In one minute
+
+- **What it does:** a field person stands on a spot and records it on a phone with photos and a short form. The record then appears on the VNV dashboard map. Nobody copies files by hand.
+- **How:** the phone runs a free mapping app called **QField**. When the phone has mobile data, the app sends new records to our own **cloud server**, and the dashboard reads from that server.
+- **Phase 1 (now): phone only.** The phone's own GPS is accurate to about 5 metres. That is enough for geotagged photos, site visits and field observations.
+- **Phase 2 (later): add an RTK receiver** (a GPS antenna on a pole) with correction signals from Survey of India. This brings accuracy to about 3 centimetres for plot boundaries and areas. The app, server and dashboard stay exactly the same.
+- **No signal in the field?** No problem. Records stay safe on the phone and send themselves once the phone is back online.
+- **Cost:** all software is open source, so there are no licence fees. Phase 1 needs only the cloud server rent. Phase 2 adds the receiver hardware and the Survey of India service.
+- **Office side, all in one place:** creating projects, designing forms, adding field persons, sending notices to their phones, reviewing, exporting and closing projects all happen in one VNV dashboard.
+
+## The big picture
+
+The office sets things up once. After that, field persons only record, and sending to the dashboard happens on its own.
+
+&#91;embedded content: the four stages · set up, record, auto-send, review\]
+
+## What we use
+
+Every software piece is open source. Phase 1 needs only the phones, the cloud server and the dashboard. The receiver and Survey of India service come in phase 2.
+
+| Piece | What it is, in plain words | When | Open source? |
+| --- | --- | --- | --- |
+| VNV field dashboard | The website where the office creates projects, designs forms, adds field persons, sends notices, reviews, exports and closes projects. **Everything office-side happens here.** | Phase 1 | Ours |
+| [QField](https://docs.qfield.org/) | The mapping app the field person uses to record points, boundaries, forms and photos | Phase 1 | Yes |
+| [ntfy](https://github.com/binwiederhier/ntfy) | A small notification app on each phone that shows messages from the office (e.g. "form update at 6 pm, please sync") | Phase 1 | Yes |
+| [QFieldCloud](https://docs.qfield.org/reference/qfieldcloud/self_hosted/) | The "post office" that receives records from the phones and keeps everyone in sync | Phase 1 | Yes |
+| [QGIS](https://qgis.org) | Mapping software that runs behind the scenes on the server to build the project files. The office does not need to open it. | Phase 1 | Yes |
+| PostGIS | The database that stores every record with its location | Phase 1 | Yes |
+| MinIO | The storage that keeps every photo | Phase 1 | Yes |
+| Cloud server | A rented computer in a data centre (e.g. AWS, Mumbai region) with a fixed internet address, so phones can always reach it | Phase 1 | Rented |
+| RTK receiver | A small GPS antenna on a pole that makes positions accurate to centimetres. Connects to the phone by Bluetooth. | Phase 2 | Hardware (purchase) |
+| [Survey of India CORS](https://surveyofindia.gov.in/pages/continuously-operating-reference-stations-cors-) | A government network of fixed GPS stations that sends correction signals over the internet | Phase 2 | Paid subscription service |
+
+## Words you will see
+
+| Word | What it means |
+| --- | --- |
+| GPS / GNSS | Satellite positioning. GNSS is the general name that also covers India's NavIC and other systems. |
+| Accuracy | How far the recorded spot could be from the true spot. "±3 cm" means within 3 centimetres. |
+| RTK fix | Phase 2. The RTK receiver's best mode, accurate to centimetres. It needs correction signals. |
+| CORS / NTRIP | Phase 2. CORS is Survey of India's network of fixed stations. NTRIP is how their correction signals reach our receiver over mobile data. |
+| Feature | One recorded thing: a point (tree, soil sample), a line (path) or an area (farm plot). |
+| Form | The questions filled in for each feature: dropdowns, numbers, notes, photos. |
+| Sync | Sending new records from the phone to the server, and getting others' updates back. |
+| Offline | Working with no mobile signal. QField records offline and syncs later. |
+| Cloud server | Our rented computer on the internet that receives and stores all records. |
+| Public address (public IP) | The fixed internet address that lets phones find the server, like a postal address. Phones do not need one; only the server does. |
+
+## Step 1: Set up (office team)
+
+There are two kinds of setup: the IT team installs the system once, then the office creates each new project in the dashboard in a few minutes.
+
+**Once, by the IT person**
+
+1. **Rent the cloud server.** A cloud computer in the Mumbai region with a fixed public address and a web address such as `field.<vnv-domain>`. It needs about 4 GB memory (8 GB recommended) and 20 GB disk plus space for photos.
+2. **Install the system on it:** QFieldCloud, the PostGIS database, MinIO photo storage, the ntfy notification service and the VNV field dashboard, all with a free HTTPS security certificate and daily backups.
+
+**For each new project, in the dashboard (no QGIS needed)**
+
+1. Create the project and upload its area boundary.
+2. Pick the layers from VNV templates and adjust the forms.
+3. Add the field persons. The dashboard creates their logins and sends them a welcome notice.
+4. Each field person's phone, once: install QField and ntfy, log in, subscribe to their notice channel, and download the project with offline maps.
+5. Office test (15 minutes): record 3 points with photos outside the office and confirm they appear on the dashboard.
+
+"Managing projects in the dashboard", further down, explains each dashboard screen in plain words.
+
+In phase 2, add one more step per phone: pair the RTK receiver, enter the Survey of India login in QField, and tighten the accuracy limit (for example 5 cm for boundaries).
+
+## Step 2: Field procedure for field persons
+
+This is everything a field person needs to know. The phone does the rest.
+
+**First day only (10 minutes, with the office)**
+
+- [ ] Install **QField** and **ntfy** from the Play Store
+- [ ] Log in to QField with the login the office gives you, and download your project
+- [ ] In ntfy, subscribe to your personal channel (the office gives you the name), and allow notifications
+- [ ] Turn off battery saving for ntfy, so notices are not delayed
+
+**Before leaving for the site (5 minutes)**
+
+- [ ] Phone fully charged, plus a power bank
+- [ ] Phone Location turned on, in high-accuracy mode
+- [ ] Open QField and the project, and check your position shows on the map
+- [ ] Check for any office notices in ntfy, and that yesterday's records show "nothing waiting to send"
+
+**At each point or plot corner**
+
+1. Stand exactly on the spot, in open sky if you can (away from tall trees, walls and vehicles).
+2. Wait until the GPS button is green and the accuracy number has settled, usually 20–30 seconds. If it stays red, the app will not let you record: wait a little, or move a few steps into the open.
+3. Tap to record. For important points, press and hold to take an average of several readings. For a plot, walk the boundary and record each corner.
+4. Fill the form: choose from the dropdowns, and take the photos from inside the form so they stay attached to that point.
+5. Save. The record is now safely on the phone, even without signal.
+
+&#91;embedded content: recording one point · the app waits for a green GPS button\]
+
+**During the day**
+
+- Nothing to press. Whenever the phone has mobile data, records send themselves in the background.
+- If there is no signal all day, that is fine. Everything sends as soon as you are back in coverage.
+
+**When a notice arrives**
+
+- **"Please sync before…"**: get to signal, open QField, tap **Synchronize**, then tap **Done** in the notice.
+- **"New form ready"**: open QField and tap **Synchronize**. The form may have a new choice or field.
+- **"Please re-visit…"**: the office wants a point checked again; it is listed in the notice.
+- **"Project closed"**: stop recording for that project.
+
+**End of the day**
+
+- [ ] Get to a place with signal and open QField; wait until it shows nothing waiting to send
+- [ ] Charge the phone and power bank
+
+**Do not**
+
+- Uninstall QField or clear its data before records have sent
+- Take survey photos with the normal camera app; they will not be linked to the point
+- Record a point while the GPS button is red
+- Ignore a "please sync" notice; it protects your unsent records during form updates
+
+**Phase 2 additions (when the RTK receiver arrives):** charge the receiver too, connect it by Bluetooth each morning, hold its pole straight up on the spot, and wait for the button to turn green with centimetre accuracy.
+
+## Step 3: How the data travels to the dashboard
+
+The phone sends each new record over mobile data to our cloud server, and the dashboard shows it within minutes.
+
+&#91;embedded content: how a record travels · phone → cloud server → dashboard (dashed parts come in phase 2)\]
+
+In plain words:
+
+1. **Finding the location:** in phase 1, the phone uses its own GPS (about 5 m). In phase 2, the phone downloads correction signals from Survey of India and passes them to the RTK receiver by Bluetooth. The receiver sends back a centimetre-accurate position.
+2. **Phone to server:** when there is signal, QField sends only what is new, the same way a web browser opens a secure (HTTPS) website. The phone does **not** need a special internet address. Only the server needs one, and the cloud server has a fixed public address.
+3. **On the server:** QFieldCloud receives the records, merges the work of all field persons, and flags it if two people changed the same plot. Records go into the PostGIS database; photos go into MinIO storage.
+4. **Server to dashboard:** the dMRV dashboard reads the same database, so new points and photos appear on the map without anyone exporting files.
+
+All of this runs on VNV's own rented server. Field data does not pass through any outside company's app.
+
+## Step 4: Checking the data on the dashboard
+
+Each evening, someone in the office spends 10 minutes checking the day's records.
+
+- **Map view:** every point, line and plot appears on satellite imagery. Tap one to see its form answers and photos.
+- **Accuracy flag:** each record carries the accuracy it was recorded with. Any record worse than the limit is highlighted for review.
+- **Counts check:** compare the number of points and photos on the dashboard with what the field person reported. A mismatch usually means something has not sent yet.
+- **Conflicts:** if two people edited the same plot, the server flags it, and the office decides which version to keep.
+- **Re-check list:** flagged or doubtful points go on the next day's field list to re-visit.
+
+## Managing projects in the dashboard
+
+The office runs a project from start to finish in the dashboard. Nobody needs QGIS, the command line or the server admin page.
+
+| # | What the office does | What happens behind the scenes |
+| --- | --- | --- |
+| 1 | **Create a project:** name, client, district, dates; upload the area boundary (KML, shapefile or GeoJSON) | The server builds the QField project file and publishes it, with the boundary shown on the phone's map |
+| 2 | **Choose layers and edit forms:** pick from VNV templates (Farm plots, Trees, Soil samples, Water points), edit dropdown choices, add simple fields (text, number, dropdown, photo), mark fields required | The database tables and the phone forms are created to match. Every template keeps the standard fields: collector, time, GPS accuracy, form version. |
+| 3 | **Add field persons:** name and phone, assigned to one or more projects | Logins are created, the project appears in their QField, and a welcome notice explains first-time setup |
+| 4 | **Update a form mid-project:** with notice to every field person (see the next part) | A safety check, a heads-up notice, a ready board, then publishing and tracking who has updated |
+| 5 | **Review records:** mark each record verified, needs re-visit or rejected, and add comments | Status is saved with the record. Re-visit items are sent to that field person as a notice and listed for the next day. |
+| 6 | **Export data:** Excel/CSV, KML, shapefile, GeoJSON, with photo links; filter by date, person or status | Files are generated from the database on demand. A PDF report with photos comes in a later version. |
+| 7 | **Track progress:** points per person per day, photos received, and what's left to visit | Counts come from the database and update as records arrive |
+| 8 | **Close or archive a project** | Phones can no longer add records, the data becomes read-only and stays exportable, and field persons get a "project closed" notice |
+
+**Who can do what:** admins can do everything; office reviewers can review, export and track; field persons only use QField on their phones.
+
+### Changing a form mid-project, safely
+
+Forms can change during a project, but only with notice before and after, and only in ways that cannot break records still on the phones.
+
+&#91;embedded content: changing a form mid-project · notice, ready check, publish, update notice, tracking\]
+
+1. **Draft and safety check.** The office edits the form in the dashboard. Only safe changes are allowed: adding a dropdown choice, adding a new optional field, or changing labels and help text. Renaming, deleting or changing the type of a field is blocked, because records still on the phones depend on it.
+2. **Heads-up notice.** Every field person on the project gets a phone notification, e.g. "Form update at 6 pm. Please sync before then." They sync and tap **Done** in the notification.
+3. **Ready board.** The dashboard shows each person's last sync and whether they tapped Done. When everyone is ready, or the deadline passes (with a warning about who isn't), the office publishes.
+4. **Update notice.** Everyone gets "New form ready: open QField and tap Synchronize". QField also shows its own "newer version available" badge.
+5. **Tracking.** Every record carries a hidden form version. If a record arrives on the old version, that person gets an automatic reminder. The previous version is kept, so the office can roll back if needed.
+
+**How notices reach the phone:** through **ntfy**, a free open-source notification app that we run on our own server. Messages appear on the lock screen even when QField is closed. Each field person installs it once and subscribes to their own channel.
+
+## How accurate it will be
+
+In phase 1, expect about 5 metres. That is fine for showing where a photo or observation was taken, but not for measuring plot areas.
+
+| Phase | Equipment | Typical accuracy | Good enough for |
+| --- | --- | --- | --- |
+| Phase 1 (now) | Phone on its own | about 5 m | Geotagged photos, site visits, observations, rough plot outlines |
+| Phase 2 (later) | Phone + RTK receiver + Survey of India corrections | about ±3 cm | Plot boundaries and areas, sample points, anything a carbon verifier will measure |
+
+**Why it matters for plots:** a 1-hectare plot (100 m × 100 m) recorded 5 m too wide on every side measures 110 m × 110 m, which is 1.21 hectares, 21% too large. With RTK, the same plot measures about 1.001 hectares. So in phase 1, treat plot boundaries as **approximate** and mark them that way on the dashboard.
+
+Getting the best from the phone in phase 1:
+
+- **Open sky:** stand away from tall trees, walls and vehicles.
+- **Wait to settle:** give the GPS 20–30 seconds before recording.
+- **Average important points:** QField can take several readings and record the average.
+- **Accuracy gate:** QField refuses to record while accuracy is worse than the limit set by the office.
+- **Proof:** the accuracy of every point is saved with it, so the office can see how trustworthy each record is.
+
+## If something goes wrong
+
+| Problem | What you will see | What to do |
+| --- | --- | --- |
+| No mobile signal at the site | Records show "waiting to send" | Keep recording; nothing is lost. Records send as soon as the phone is back in coverage. |
+| GPS button stays red | The app will not let you record | Wait 1–2 minutes, move into open sky away from trees and buildings, and check phone Location is on in high-accuracy mode |
+| Accuracy number is large (e.g. 15 m or more) | Points land in the wrong place on the map | Wait longer, move into the open, or use averaging. Note it in the form if you must record anyway. |
+| Office notices arrive late or not at all | Field person did not get a "please sync" or "new form" notice | Check ntfy is subscribed to the right channel and battery saving is off for ntfy. The office can see on the ready board who has not responded, and should phone them. |
+| "Still on old form" reminder | A reminder notice from the office | Open QField where there is signal and tap Synchronize |
+| Photos missing on the dashboard | Fewer photos than you took | Open QField where there is signal and let it finish sending. If still missing, tell the office before deleting anything. |
+| Two people edited the same plot | A conflict flag on the dashboard | Nothing for the field person to do; the office chooses the right version |
+| Cloud server down | The phone keeps showing "waiting to send" | Keep working; nothing is lost. The office fixes the server, and records send automatically. |
+| App update changed something | Project looks different or will not open | Do not update QField or ntfy in the field. The office tests updates first and tells you when to update. |
+
+## Before the first field day
+
+**Phase 1: decisions needed**
+
+- [ ] Approve a cloud server (provider, account) and a web address for it
+- [ ] Decide who in the office is admin, and who is reviewer
+
+**Phase 1: setup work**
+
+- [ ] Install QFieldCloud, PostGIS, MinIO and ntfy on the cloud server, with HTTPS and daily backups
+- [ ] Build the VNV field dashboard: projects, form templates, people, notices, review, export, progress, close
+- [ ] Create the VNV layer templates (Farm plots, Trees, Soil samples, Water points)
+- [ ] Create the first project in the dashboard, with plot boundaries marked "approximate"
+- [ ] Office test: 3 points with photos appear on the dashboard
+- [ ] Notice test: a form update goes through the full notice flow on two phones
+- [ ] Short training for field persons using Step 2 of this guide
+
+**Later versions**
+
+- [ ] PDF report with photos, from the dashboard
+- [ ] Phase 2 RTK: choose and buy receiver(s), register for Survey of India CORS, confirm site coverage, run an accuracy test on a known survey mark, and re-survey phase 1 plot boundaries that will be used in carbon claims
+
+## Why QField
+
+QField was chosen because it is open source, works offline, connects to RTK receivers without extra apps, and syncs to a server we control.
+
+**Compared with SW Maps** (the app first suggested): SW Maps is free but closed source, and it can only send data by manual upload to a file (FTP) server. QField matches it on almost everything field teams use: points, lines and areas, forms with photos, offline maps, measuring, averaging and stakeout. It adds automatic syncing, an accuracy gate, stricter forms, and bearing-and-distance tools. Two things SW Maps has that QField does not:
+
+- **Raw GPS data logging for later processing.** Matters only in phase 2: if a site has no signal for corrections, use a receiver that stores raw data internally.
+- **Creating new forms on the phone in the field.** With QField, forms are prepared in the office, which keeps data consistent across the team.
+
+**Other open-source options considered:**
+
+| App + server | Good at | Why not first choice |
+| --- | --- | --- |
+| [Mergin Maps](https://merginmaps.com/docs/misc/licensing/) | Simple QGIS-based field app with sync | Fewer survey features than QField |
+| [ODK Collect + ODK Central](https://github.com/getodk/central) | Very proven questionnaire surveys | Weak for drawing plots on a map; RTK only through a separate helper app |
+| [KoboToolbox](https://support.kobotoolbox.org/api) | Forms; already familiar at VNV | Same limits as ODK |
+
+## Sources
+
+- [QField GNSS documentation](https://docs.qfield.org/how-to/navigation-and-positioning/gnss/): accuracy by equipment, accuracy limit, averaging, NMEA logging
+- [QField 4.2 release: built-in RTK corrections and Bluetooth LE](https://qfield.org/blog/2026/06/09/qfield-4.2-coral-sea-reaching-sub-centimeter-accuracy-out-of-the-box/)
+- [QField 3.2 release: automatic background sending](https://planet.qgis.org/posts/qfield-3.2-congo-making-your-life-easier/)
+- [QField navigation and stakeout](https://docs.qfield.org/how-to/navigation)
+- [QFieldCloud self-hosting](https://docs.qfield.org/reference/qfieldcloud/self_hosted/) and its [server requirements](https://www.mintlify.com/opengisch/qfieldcloud/deployment/self-hosting)
+- [Survey of India CORS](https://surveyofindia.gov.in/pages/continuously-operating-reference-stations-cors-) and its [note on RTK and CORS](https://Surveyofindia.gov.in/webroot/UserFiles/files/Note%20on%20RTK%20and%20CORS.pdf) (±3 cm)
+- [SW Maps manual](https://aviyaantech.com.np/SwMaps/assets/SW%20Maps%20Manual%20V3.0.pdf) and [SW Maps raw data logging](https://www.unoosa.org/documents/pdf/psa/activities/2019/UN_Fiji_2019/S5-28.pdf)
+- [ArduSimple PPK data logger guide](https://ardusimple.com/?p=22602) (raw-data fallback)
+- [Mergin Maps licensing](https://merginmaps.com/docs/misc/licensing/), [ODK Central](https://github.com/getodk/central), [KoboToolbox API](https://support.kobotoolbox.org/api)
+- [ntfy, open-source notifications](https://github.com/binwiederhier/ntfy) (Apache 2.0 / GPLv2, self-hostable, Android app)
+- [QField: indicator for newer project versions on QFieldCloud](https://docs.qfield.org/get-started/tutorials/get-started-qfc/)
+- [QField plugins](https://docs.qfield.org/reference/plugins) (optional in-app notices)
