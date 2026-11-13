@@ -1,0 +1,337 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Satellite dMRV Coverage</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Hallmark · genre: modern-minimal · macrostructure: single-slide evidence matrix · design-system: platform design.md (VNV)
+ * theme: custom (vibe: "instrument-grade field ledger, warm paper") · paper oklch(97.2% 0.005 70) · accent oklch(66% 0.18 41) VNV orange
+ * type: IBM Plex Sans + IBM Plex Mono (measured values only) · tone: utilitarian · enrichment: none · nav: none · footer: source line
+ * Hallmark · pre-emit critique: P5 H4 E4 S5 R5 V3 (variety held back on purpose: matches the product's locked system)
+ */
+/* Layout: one 16:9 slide. Title block left, legend right; a ruled matrix of checks x commodities; a one-line source strip. */
+:root {
+  --bg: oklch(97.2% 0.005 70);
+  --surface: oklch(99.4% 0.003 70);
+  --band: oklch(94.6% 0.007 70);
+  --rule: oklch(89.5% 0.007 70);
+  --rule-strong: oklch(80.5% 0.01 65);
+  --text: oklch(21% 0.012 55);
+  --text-muted: oklch(42% 0.012 60);
+  --text-faint: oklch(48% 0.01 60);
+  --accent: oklch(66% 0.18 41);
+  --accent-strong: oklch(53% 0.17 43);
+
+  --ok: oklch(45% 0.13 150);
+  --ok-fill: oklch(92% 0.05 150);
+  --ok-ink: oklch(34% 0.1 150);
+  --flag: oklch(68% 0.15 75);
+  --flag-fill: oklch(94% 0.06 82);
+  --flag-ink: oklch(42% 0.09 65);
+  --flag-hatch: oklch(68% 0.15 75 / 0.22);
+  --no: oklch(55% 0.18 25);
+  --no-fill: oklch(95% 0.03 25);
+  --no-ink: oklch(45% 0.15 25);
+  --na: oklch(70% 0.008 65);
+
+  --font-sans: "IBM Plex Sans", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+
+  --space-2xs: 0.25rem; --space-xs: 0.5rem; --space-sm: 0.75rem;
+  --space-md: 1rem; --space-lg: 1.5rem; --space-xl: 2.5rem;
+  --radius-xs: 3px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: oklch(17% 0.008 65); --surface: oklch(20.5% 0.009 65); --band: oklch(23% 0.01 65);
+    --rule: oklch(30% 0.01 65); --rule-strong: oklch(38% 0.012 65);
+    --text: oklch(93% 0.006 70); --text-muted: oklch(77% 0.008 70); --text-faint: oklch(68% 0.008 70);
+    --accent: oklch(70% 0.17 41); --accent-strong: oklch(74% 0.15 45);
+    --ok: oklch(68% 0.13 150); --ok-fill: oklch(30% 0.06 150); --ok-ink: oklch(86% 0.08 150);
+    --flag: oklch(74% 0.14 75); --flag-fill: oklch(31% 0.05 75); --flag-ink: oklch(88% 0.09 80); --flag-hatch: oklch(74% 0.14 75 / 0.2);
+    --no: oklch(66% 0.16 25); --no-fill: oklch(28% 0.05 25); --no-ink: oklch(84% 0.08 25);
+    --na: oklch(46% 0.01 65);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: oklch(17% 0.008 65); --surface: oklch(20.5% 0.009 65); --band: oklch(23% 0.01 65);
+  --rule: oklch(30% 0.01 65); --rule-strong: oklch(38% 0.012 65);
+  --text: oklch(93% 0.006 70); --text-muted: oklch(77% 0.008 70); --text-faint: oklch(68% 0.008 70);
+  --accent: oklch(70% 0.17 41); --accent-strong: oklch(74% 0.15 45);
+  --ok: oklch(68% 0.13 150); --ok-fill: oklch(30% 0.06 150); --ok-ink: oklch(86% 0.08 150);
+  --flag: oklch(74% 0.14 75); --flag-fill: oklch(31% 0.05 75); --flag-ink: oklch(88% 0.09 80); --flag-hatch: oklch(74% 0.14 75 / 0.2);
+  --no: oklch(66% 0.16 25); --no-fill: oklch(28% 0.05 25); --no-ink: oklch(84% 0.08 25);
+  --na: oklch(46% 0.01 65);
+  color-scheme: dark;
+}
+
+html, body { overflow-x: clip; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: var(--space-lg);
+}
+
+.slide {
+  max-width: 1360px;
+  margin-inline: auto;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-top: 3px solid var(--accent);
+  padding: var(--space-xl) var(--space-xl) var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+@media (min-width: 1100px) {
+  .slide { aspect-ratio: 16 / 9; }
+}
+
+/* ---- head ---- */
+.head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-xl);
+  align-items: end;
+}
+h1 {
+  margin: 0;
+  font-weight: 600;
+  font-size: clamp(1.5rem, 1.1rem + 1.4vw, 2.15rem);
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.lede {
+  margin: var(--space-xs) 0 0;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  max-width: 62ch;
+}
+.legend {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+.legend div { display: flex; align-items: center; gap: var(--space-xs); }
+.legend .mark { width: 54px; flex: none; }
+
+/* ---- matrix ---- */
+.matrix-wrap { overflow-x: auto; min-width: 0; flex: 1; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+  min-width: 980px;
+}
+th, td { padding: 4px var(--space-xs); text-align: left; vertical-align: middle; }
+thead th {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border-bottom: 1.5px solid var(--text);
+  padding-bottom: var(--space-xs);
+  white-space: nowrap;
+}
+thead th.crop { text-align: center; width: 8.2%; }
+.reg {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--accent-strong);
+  letter-spacing: 0.04em;
+}
+.reg.quiet { color: var(--text-faint); }
+
+tbody th { font-weight: 500; font-size: 0.8125rem; width: 21%; }
+.acc {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--text-faint);
+  font-weight: 400;
+}
+td.gap { font-size: 0.75rem; color: var(--text-muted); width: 21%; padding-left: var(--space-md); }
+tbody tr { border-bottom: 1px solid var(--rule); }
+tr.group td {
+  padding-top: var(--space-sm);
+  padding-bottom: 3px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  border-bottom: 1px solid var(--rule-strong);
+}
+td.c { text-align: center; padding-inline: 3px; }
+
+/* state marks: colour + pattern + word, never colour alone */
+.mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 100%;
+  max-width: 92px;
+  height: 22px;
+  border-radius: var(--radius-xs);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.mark::before { content: ""; width: 7px; height: 7px; flex: none; }
+.mark.ok { background: var(--ok-fill); color: var(--ok-ink); }
+.mark.ok::before { background: var(--ok); border-radius: 50%; }
+.mark.flag {
+  background: var(--flag-fill) repeating-linear-gradient(135deg, var(--flag-hatch) 0 3px, transparent 3px 7px);
+  color: var(--flag-ink);
+}
+.mark.flag::before { background: var(--flag); clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+.mark.no { background: var(--no-fill); color: var(--no-ink); box-shadow: inset 0 0 0 1px var(--no); }
+.mark.no::before {
+  width: 8px; height: 8px;
+  background: linear-gradient(45deg, transparent 42%, var(--no) 42% 58%, transparent 58%),
+              linear-gradient(-45deg, transparent 42%, var(--no) 42% 58%, transparent 58%);
+}
+.na { color: var(--na); font-family: var(--font-mono); }
+
+tfoot td {
+  padding-top: var(--space-xs);
+  border-top: 1.5px solid var(--text);
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+tfoot td.c { white-space: nowrap; }
+tfoot b { font-weight: 500; color: var(--text); }
+
+/* ---- source strip ---- */
+.source {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-xs) var(--space-xl);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  border-top: 1px solid var(--rule);
+  padding-top: var(--space-sm);
+}
+.source p { margin: 0; max-width: 95ch; }
+.source strong { color: var(--text); font-weight: 600; }
+.source .stamp { font-family: var(--font-mono); color: var(--text-faint); white-space: nowrap; }
+
+@media (max-width: 760px) {
+  .slide { padding: var(--space-lg) var(--space-md); }
+  .head { grid-template-columns: minmax(0, 1fr); gap: var(--space-md); }
+  .legend { flex-direction: row; flex-wrap: wrap; gap: var(--space-xs) var(--space-md); }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+
+<main class="slide" aria-labelledby="t">
+  <header class="head">
+    <div>
+      <h1 id="t">What satellite data can verify, crop by crop</h1>
+      <p class="lede">Each check compares what we observe from orbit with what the farmer or field team declared. Satellites confirm practices and flag discrepancies. They don't replace ground measurement.</p>
+    </div>
+    <div class="legend" aria-label="Legend">
+      <div><span class="mark ok">Strong</span> Reliable from imagery</div>
+      <div><span class="mark flag">Flag</span> Plausibility check, needs ground data</div>
+      <div><span class="mark no">No</span> Not observable from orbit</div>
+      <div><span class="mark"><span class="na">—</span></span> Not required for this crop</div>
+    </div>
+  </header>
+
+  <div class="matrix-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Check <span class="reg quiet">Indicative accuracy</span></th>
+          <th scope="col" class="crop">Cotton<span class="reg quiet">LSRS</span></th>
+          <th scope="col" class="crop">Rice<span class="reg quiet">LSRS</span></th>
+          <th scope="col" class="crop">Sugarcane<span class="reg quiet">LSRS</span></th>
+          <th scope="col" class="crop">Coffee<span class="reg">LSRS · EUDR</span></th>
+          <th scope="col" class="crop">Cocoa<span class="reg">LSRS · EUDR</span></th>
+          <th scope="col" class="crop">Tea<span class="reg quiet">LSRS</span></th>
+          <th scope="col">Ground data that closes the gap</th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+      <tfoot><tr id="totals"></tr></tfoot>
+    </table>
+  </div>
+
+  <footer class="source">
+    <p><strong>Runs on VNV's Spectral Indices module and the CDSE / VNV pipeline</strong> (Sentinel-2 optical, Sentinel-1 radar, Landsat). Accuracy ranges come from established methods and published studies. They are not yet validated on Indian smallholder plots and will be confirmed on a VNV pilot.</p>
+    <span class="stamp">VNV dMRV · Nov 2026</span>
+  </footer>
+</main>
+
+<script>
+// s = Strong, f = Flag, n = No, - = not required. Order: cotton, rice, sugarcane, coffee, cocoa, tea
+const GROUPS = [
+  ["At enrolment", [
+    ["Plot boundary validity", "~100% (GIS rule check)", "ssssss", "Field-walked GPS polygons"],
+    ["Mapped area vs declared area", "±10–20% on plots under 1 ha", "ffffff", "Land records, high-res imagery"],
+    ["Forest status at 31 Dec 2020", "85–90% for clear cases", "---ff-", "Local training plots, analyst review of shade systems"],
+  ]],
+  ["Through the season", [
+    ["Crop extent", "75–95%, radar works through cloud", "fssffs", "Geotagged field photos"],
+    ["Sowing and harvest dates", "±1–2 weeks", "fff---", "Farmer logs, field-visit dates"],
+    ["Residue or pre-harvest burning", "80–90% when cloud-free", "fff-f-", "Harvest photos, mill and harvester records"],
+    ["Flooding vs drying (AWD)", "75–85% at season level", "-f----", "Water-level tubes with IoT sensors"],
+    ["Tillage and residue cover", "70–85%, depth not visible", "f-f---", "Field photos, machinery records"],
+    ["Canopy and shade-tree cover", "±10–15 points", "---fff", "Sample-plot tree inventory"],
+    ["Yield vs declared volume", "15–30% error", "fffff-", "Mill weighbridge, procurement records"],
+  ]],
+  ["Carbon-stock loss watch", [
+    ["Clearing or land conversion", "80–90% above 0.5–1 ha", "ssssss", "Analyst review of each alert"],
+    ["Flood events", "~90%", "ssssss", "Field confirmation"],
+  ]],
+  ["Not visible from orbit", [
+    ["Soil organic carbon", "Annual change below detection", "nnnnnn", "Soil sampling + soil-carbon model"],
+    ["Fertiliser nitrogen rate", "Not observable", "nn-n-n", "Input invoices, Soil Health Cards"],
+    ["Irrigation method", "Irrigated vs rainfed only", "n-----", "Farm records, IoT soil-moisture probes"],
+    ["Processing and mill energy", "Not spatial", "--nnnn", "Metered energy records"],
+  ]],
+];
+const LABEL = { s: ["ok", "Strong"], f: ["flag", "Flag"], n: ["no", "No"] };
+const tbody = document.getElementById("rows");
+const totals = [0,1,2,3,4,5].map(() => ({ s: 0, f: 0, n: 0 }));
+const esc = (t) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+
+let html = "";
+for (const [group, rows] of GROUPS) {
+  html += `<tr class="group"><td colspan="8">${esc(group)}</td></tr>`;
+  for (const [check, acc, states, gap] of rows) {
+    html += `<tr><th scope="row">${esc(check)}<span class="acc">${esc(acc)}</span></th>`;
+    [...states].forEach((k, i) => {
+      if (k === "-") { html += `<td class="c"><span class="na" aria-label="Not required">—</span></td>`; return; }
+      totals[i][k]++;
+      const [cls, word] = LABEL[k];
+      html += `<td class="c"><span class="mark ${cls}">${word}</span></td>`;
+    });
+    html += `<td class="gap">${esc(gap)}</td></tr>`;
+  }
+}
+tbody.innerHTML = html;
+
+document.getElementById("totals").innerHTML =
+  `<td>Strong · flag · no</td>` +
+  totals.map(t => `<td class="c"><b>${t.s}</b> · <b>${t.f}</b> · <b>${t.n}</b></td>`).join("") +
+  `<td></td>`;
+</script>
+
+</body></html>
